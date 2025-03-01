@@ -1,0 +1,22 @@
+[project]
+name = "pandas-should-go-extinct"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "scalene>=1.5.51",
+    "pandas>=2.2.3",
+    "polars>=1.22.0",
+    "memray>=1.15.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "pandas-stubs>=2.2.3.241126",
+    "viztracer>=1.0.2",
+]
