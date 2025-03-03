@@ -9,6 +9,9 @@ dependencies = [
     "pandas>=2.2.3",
     "polars>=1.22.0",
     "memray>=1.15.0",
+    "duckdb>=1.2.0",
+    "pyperf>=2.8.1",
+    "yappi>=1.6.10",
 ]
 
 [build-system]
