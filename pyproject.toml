@@ -5,13 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "scalene>=1.5.51",
     "pandas>=2.2.3",
     "polars>=1.22.0",
-    "memray>=1.15.0",
     "duckdb>=1.2.0",
-    "pyperf>=2.8.1",
-    "yappi>=1.6.10",
+    "matplotlib>=3.10.1",
+    "seaborn>=0.13.2",
+    "psutil>=7.0.0",
 ]
 
 [build-system]
@@ -20,6 +19,5 @@ build-backend = "hatchling.build"
 
 [tool.uv]
 dev-dependencies = [
-    "pandas-stubs>=2.2.3.241126",
-    "viztracer>=1.0.2",
+    "pandas-stubs>=2.2.3.241126"
 ]

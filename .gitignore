@@ -1,7 +1,7 @@
 data/output/**
 data/input/**
-data/measurements.csv
-data/measurements.parquet
+data/*.csv
+data/*.parquet
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

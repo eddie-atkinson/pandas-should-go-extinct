@@ -1,6 +1,6 @@
 import polars as pl
 
-from constants import DATA_PATH
+from pandas_should_go_extinct.constants import DATA_PATH
 
 
 def do_1brc_polars(file_path: str, output_data=True) -> str:
@@ -24,8 +24,8 @@ def do_1brc_polars(file_path: str, output_data=True) -> str:
             pl.col("measurement").max().round(2).alias("max"),
         )
         .sort(by="station")
-        .collect()
-    )
+        .collect(new_streaming=True)
+    )  # type: ignore
 
     if output_data:
         result = []

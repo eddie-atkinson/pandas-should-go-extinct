@@ -1,6 +1,6 @@
 import duckdb
 
-from constants import DATA_PATH
+from pandas_should_go_extinct.constants import DATA_PATH
 
 
 def do_1brc_duckdb(file_path: str, output_data=True) -> str:
@@ -11,7 +11,7 @@ def do_1brc_duckdb(file_path: str, output_data=True) -> str:
     df = duckdb.read_csv(file_path, names=["station", "measurements"])
 
     src = duckdb.sql(
-        "select station,  min(measurements) min, max(measurements) max, cast(avg(measurements) as decimal(8, 1)) avg from df group by station"
+        "create table src as select station, min(measurements) min, max(measurements) max, cast(avg(measurements) as decimal(8, 1)) avg from df group by station"
     )
 
     if output_data:

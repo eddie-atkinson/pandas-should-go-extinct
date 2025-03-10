@@ -1,6 +1,6 @@
 import pandas as pd
 
-from constants import DATA_PATH
+from pandas_should_go_extinct.constants import DATA_PATH
 
 
 def do_1brc_pandas(file_path: str, output_data=True) -> str:

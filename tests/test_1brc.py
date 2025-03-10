@@ -1,9 +1,9 @@
-from pandas_should_go_extinct.duckdb_1brc import do_1brc_duckdb
+from duckdb_1brc import do_1brc_duckdb
 from pathlib import Path
 from unittest import TestCase, main
 
-from pandas_should_go_extinct.pandas_1brc import do_1brc_pandas
-from pandas_should_go_extinct.polars_1brc import do_1brc_polars
+from pandas_1brc import do_1brc_pandas
+from polars_1brc import do_1brc_polars
 
 SIMPLE_PATH = Path("./tests/fixtures/simple.csv")
 SIMPLE_WITH_AGG_PATH = Path("./tests/fixtures/simple_with_agg.csv")

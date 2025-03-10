@@ -1,29 +1,31 @@
-from constants import DATA_PATH
-from pandas_should_go_extinct.duckdb_1brc import do_1brc_duckdb
-from pandas_should_go_extinct.pandas_1brc import do_1brc_pandas
-from pandas_should_go_extinct.polars_1brc import do_1brc_polars
+from pathlib import Path
+from pandas_should_go_extinct.benchmark import Benchmark
 
-# N_RUNS = 5
-# Why only one core per test? Simply because Polars and DuckDB are multi-threaded,
-# so we want to give their threads room to gallop without having other tests interfering
-# N_PROCESSES = 1
 
-# runner = pyperf.Runner(processes=N_PROCESSES, values=N_RUNS)
+DUCKDB_PATH = Path("./duckdb_1brc.py")
+DUCKDB_OUTPUT_PATH = Path("./data/duckdb_timeseries.csv")
+
+POLARS_PATH = Path("./polars_1brc.py")
+POLARS_OUTPUT_PATH = Path("./data/polars_timeseries.csv")
+
+PANDAS_PATH = Path("./pandas_1brc.py")
+PANDAS_OUTPUT_PATH = Path("./data/pandas_timeseries.csv")
+
+
+PROFILE_FIXTURES = [
+    (DUCKDB_PATH, DUCKDB_OUTPUT_PATH),
+    # (POLARS_PATH, POLARS_OUTPUT_PATH),
+    #   (PANDAS_PATH, PANDAS_OUTPUT_PATH)
+]
 
 
 def main():
-    do_1brc_duckdb(DATA_PATH)
-    # results = runner.bench_func("DuckDB", do_1brc_duckdb, DATA_PATH)
-    # if results is not None:
-    #     results.dump("./data/duckdb.json", replace=True)
-
-    # results = runner.bench_func("Polars", do_1brc_polars, DATA_PATH)
-    # if results is not None:
-    #     results.dump("./data/polars.json", replace=True)
-
-    # results = runner.bench_func("Pandas", do_1brc_pandas, DATA_PATH)
-    # if results is not None:
-    #     results.dump("./data/pandas.json", replace=True)
+    for test_script, output_path in PROFILE_FIXTURES:
+        print(f"Running benchmark script {test_script} with output in {output_path}")
+        benchmark = Benchmark(
+            script_path=test_script, output_file_path=output_path, n_warmup=0, n_iter=5
+        )
+        benchmark.run()
 
 
 if __name__ == "__main__":
