@@ -28,8 +28,9 @@ def plot_df(df: pl.DataFrame, title: str, ax):
     ax.set_ylabel("RSS")
     ax.grid(True)
 
+
 df_polars = pl.read_csv(POLARS_OUTPUT_PATH)
-# df_pandas = pl.read_csv(PANDAS_OUTPUT_PATH)
+df_pandas = pl.read_csv(PANDAS_OUTPUT_PATH)
 df_duckdb = pl.read_csv(DUCKDB_OUTPUT_PATH)
 
 fig, axes = plt.subplots(3, 1, figsize=(10, 15))
@@ -37,6 +38,3 @@ plot_df(df_polars, "Polars RSS Over Time", axes[0])
 plot_df(df_duckdb, "DuckDB RSS Over Time", axes[1])
 plt.tight_layout()
 plt.savefig(FIGURES_DIR / "timeseries.png")
-
-
-
