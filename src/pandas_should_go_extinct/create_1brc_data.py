@@ -30,11 +30,11 @@ def check_args(file_args):
     Sanity checks out input and prints out usage if input is not a positive integer
     """
     try:
-        if len(file_args) != 2 or int(file_args[1]) <= 0:
+        if len(file_args) != 3 or int(file_args[1]) <= 0:
             raise Exception()
     except:
         print(
-            "Usage:  create_measurements.sh <positive integer number of records to create>"
+            "Usage:  create_measurements.sh <positive integer number of records to create> <random_seed>"
         )
         print("        You can use underscore notation for large number of records.")
         print("        For example:  1_000_000_000 for one billion")
@@ -158,9 +158,10 @@ def main():
     main program function
     """
     # Use a fixed seed to make results more reproducible
-    random.seed(42)
     check_args(sys.argv)
     num_rows_to_create = int(sys.argv[1])
+    random_seed  = int(sys.argv[2])
+    random.seed(random_seed)
     weather_station_names = []
     weather_station_names = build_weather_station_name_list()
     print(estimate_file_size(weather_station_names, num_rows_to_create))

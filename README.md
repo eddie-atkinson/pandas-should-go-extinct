@@ -4,7 +4,7 @@ This is a somewhat scientific look at how various standard Python data processin
 To run this project you will need to [install](https://docs.astral.sh/uv/getting-started/installation/) `uv` as your package manager and run:
 ```{sh}
 uv venv
-uv run python src/pandas_should_go_extinct/create_1brc_data.py
+uv run python src/pandas_should_go_extinct/create_1brc_data.py 1_000_000_000 42
 ```
 To generate the data. This should create a `measurements.csv` and `measurements.parquet` in the `data` directory.
 
