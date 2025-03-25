@@ -4,6 +4,7 @@
 
 # Usage: ./run_python_script.sh <python_binary path> <python_script.py> <iterations> <warmup> <output_file.csv>
 # If you use a Mac you will need to install the GNU time implementation using `brew install gnu-time`
+# Note that `time` is a shell utility on many Linux distributions and will require installation via your package manager to work here
 
 interpreter="$1"
 python_script="$2"
