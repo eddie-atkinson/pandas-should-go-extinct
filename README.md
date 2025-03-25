@@ -15,6 +15,8 @@ chmod +x ./run_profile.sh ./profile.sh
 ```
 If you are using a Mac you will need to install GNU time using `brew install gtime`.
 
+On many Linux distributions `time` is actually a shell utility, not a stand-alone binary. You may also need to install `time` using your package manager of choice.
+
 To summarise the results you can use:
 ```{sh}
 uv run process_gtime_results.py
