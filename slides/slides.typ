@@ -50,7 +50,9 @@
   image("figures/fleet_size_query_comparison.png"),
   caption: [Bucketed Query Runtime for Amazon RedShift Fleet Over 1 Month @van2024tpc],
 )
-
+= No one has or queries or Big Data\*
+#pause
+\*almost no one
 = Shut up and show me the code
 
 == Example: 1 Billion Row Challenge
@@ -69,6 +71,7 @@ Fastest JVM implementation: *1.535 seconds*
 
 #pause
 Our Experimental Setup:
+- ~16GB CSV
 - AWS M7a.8xlarge
   - 32 core AMD CPU
   - 128 GB of RAM
@@ -173,20 +176,48 @@ def do_1brc_duckdb(file_path: str):
 )]
 
 == Results (M1 MBA, 16GB RAM)
+#table(
+  columns: (auto, auto, auto, auto),
+  align: center,
+  inset: 15pt,
+  table.header(
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max RSS*],
+  ),
+  $ "Pandas" $,
+  $"3m 57s" $,
+  $"101.0%"$,
+  $"33.34 GB"$,
+  $ "Polars" $,
+  $"3.92s" $,
+  $"2588.5%"$,
+  $"17.98 GB"$,
+  $ "DuckDB" $,
+  $"4.19s" $,
+  $"2979.0%"$,
+  $"1.93 GB"$,
+)
 
-
+== What do these tools give us?
+- Great performance on a flawed benchmark
+#pause
+- Painless multi-threading
+- Streaming
+- Spill to disk
+- Lazy evaluation
 == Simple Animation
 
-We can use `#pause` to #pause display something later.
+= I'm interested but I've been hurt before
 
-#meanwhile
+== Painless Adoption with Arrow
+- In-memory column oriented data format
+#pause
+- Supported in Pandas since 2.0 (April 2023)
+  - Some functions still create NumPy arrays
+#pause
+- *Polars and DuckDB support zero copy serialisation from Arrow-backed Pandas DataFrames*
 
-Meanwhile, #pause we can also use `#meanwhile` to display other content synchronously.
+== Practical Example
 
-#speaker-note[
-  + This is a speaker note.
-  + You won't see it unless you use `config-common(show-notes-on-second-screen: right)`
-]
 
 #show: appendix
 #bibliography("works.bib")

@@ -37,4 +37,5 @@ This will produce a figure in `figures/timeseries.png`
 ## General Experimentation Approach
 I have opted to use `time` as a simple profiling mechanism for run time as it should have a relatively low overhead and our focus for the `time` tests is the user observed run time, as this is ultimately what we pay $CLOUD_PROVIDER for and what our employer pays us for.
 
-For the purposes of plotting `psutil` is also used. Given the naive approach to sampling (read info from `psutil` every ~50ms) I wouldn't trust the runtime statistics for these tests as it's possible the capturing of statistics competes for CPU time and/or causes cache coherency problems. The aim for this script is really to see how the resident set size (RSS) changes over time
+## Repository Structure
+The repo isn't a perfect example of a Python package. There are quite a few top-level scripts, this is simply because it was easier to do shell scripting against top-level scripts. Don't @ me

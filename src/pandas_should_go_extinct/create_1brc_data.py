@@ -160,7 +160,7 @@ def main():
     # Use a fixed seed to make results more reproducible
     check_args(sys.argv)
     num_rows_to_create = int(sys.argv[1])
-    random_seed  = int(sys.argv[2])
+    random_seed = int(sys.argv[2])
     random.seed(random_seed)
     weather_station_names = []
     weather_station_names = build_weather_station_name_list()
