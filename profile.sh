@@ -19,7 +19,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 if [ ! -f "$output_file" ] || [ -z "$(cat "$output_file")" ]; then
-    echo "Iteration,real,user,sys,cpu%,maxrss" >"$output_file"
+    echo "Iteration,real,user,sys,cpu%,maxrss,major_page_faults,minor_page_faults" >"$output_file"
 fi
 
 # Warmup
@@ -38,7 +38,7 @@ fi
 echo "Running measured iterations ($iterations iterations)..."
 for i in $(seq 1 "$iterations"); do
     echo "Execution run $i"
-    { $time_binary -p -f "%E,%U,%S,%P,%M" $interpreter "$python_script" >/dev/null; } 2>&1 | awk -F',' '{printf "%s,%s,%s,%s,%s,%s\n", "'$i'", $1, $2, $3, $4, $5}' >>"$output_file"
+    { $time_binary -p -f "%E,%U,%S,%P,%M,%F,%R" $interpreter "$python_script" >/dev/null; } 2>&1 | awk -F',' '{printf "%s,%s,%s,%s,%s,%s,%s,%s\n", "'$i'", $1, $2, $3, $4, $5, $6, $7}' >>"$output_file"
 
     if [ $? -ne 0 ]; then
         echo "Warning: Python script crashed during measured iteration $i."

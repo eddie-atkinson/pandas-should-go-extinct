@@ -1,4 +1,4 @@
-Iteration,real,user,sys,cpu%,maxrss
+Iteration,real,user,sys,cpu%,maxrss,major_page_faults,minor_page_faults
 1,0:04.10,86.06,14.09,2438%,18050436
 2,0:03.85,86.12,13.88,2596%,17916272
 1,0:03.88,86.69,13.96,2588%,17904140
