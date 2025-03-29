@@ -14,8 +14,9 @@ class UtilisationStat:
     time_s: float
     rss: int
     vms: int
-    pfaults: int
-    pageins: int
+    # Whether or not this information exists depends on platform - not on Linux it seems
+    pfaults: Optional[int]
+    pageins: Optional[int]
     cpu_pct: float
     # Whether or not this information is available depends on user privileges
     uss: Optional[int]
@@ -42,7 +43,7 @@ class Benchmark:
         self,
         script_path: Path,
         output_file_path: Path,
-        peek_ms=50,
+        peek_ms=100,
         n_warmup=2,
         n_iter=30,
     ):
@@ -78,14 +79,16 @@ class Benchmark:
                 cpu_utilisation = monitored_process.cpu_percent()
                 swap = getattr(memory_utilisation, "swap", None)
                 uss = getattr(memory_utilisation, "uss", None)
+                pageins = getattr(memory_utilisation, "pageins", None)
+                pfaults = getattr(memory_utilisation, "pfaults", None)
 
                 data_readings.append(
                     UtilisationStat(
                         run_no=run_no,
                         time_s=time() - start_time,
                         cpu_pct=cpu_utilisation,
-                        pageins=memory_utilisation.pageins,
-                        pfaults=memory_utilisation.pfaults,
+                        pageins=pageins,
+                        pfaults=pfaults,
                         rss=memory_utilisation.rss,
                         vms=memory_utilisation.vms,
                         uss=uss,

@@ -14,17 +14,15 @@ PANDAS_OUTPUT_PATH = Path("./data/pandas_timeseries.csv")
 
 PROFILE_FIXTURES = [
     (POLARS_PATH, POLARS_OUTPUT_PATH),
-    # (DUCKDB_PATH, DUCKDB_OUTPUT_PATH),
-    # (PANDAS_PATH, PANDAS_OUTPUT_PATH),
+    (DUCKDB_PATH, DUCKDB_OUTPUT_PATH),
+    (PANDAS_PATH, PANDAS_OUTPUT_PATH),
 ]
 
 
 def main():
     for test_script, output_path in PROFILE_FIXTURES:
         print(f"Running benchmark script {test_script} with output in {output_path}")
-        benchmark = Benchmark(
-            script_path=test_script, output_file_path=output_path, n_warmup=2, n_iter=5, peek_ms=100
-        )
+        benchmark = Benchmark(script_path=test_script, output_file_path=output_path)
         benchmark.run()
 
 
