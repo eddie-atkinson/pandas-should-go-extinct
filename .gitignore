@@ -2,6 +2,7 @@ data/output/**
 data/input/**
 data/*.csv
 data/*.parquet
+data/taxi/*.parquet
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
