@@ -17,11 +17,11 @@ DUCK_COMPUTE_OUTPUT_PATH = Path("./data/taxi/duck_compute.csv")
 DUCK_ONLY_OUTPUT_PATH = Path("./data/taxi/duck_only.csv")
 
 
-def print_stats(path: Path, name: str):
+def print_stats(path: Path, name: str, record_offset=1):
     str_path = str(path.absolute())
     # Have to slightly fudge the time here to account for the Python interpreter starting
     by_run_no = duckdb.sql(
-        f"select max(uss) / 1_000_000 as uss_mb, max(cpu_pct) as cpu_pct, max(time_s) as time_s, max(swap) / 1_000_000 as swap_mb from '{str_path}' where time_s > 1 group by run_no;"
+        f"select max(uss) / 1_000_000 as uss_mb, max(cpu_pct) as cpu_pct, max(time_s) as time_s, max(swap) / 1_000_000 as swap_mb from '{str_path}' where time_s > {record_offset} group by run_no;"
     )
     print(name)
     print("-----")
@@ -39,7 +39,7 @@ print_stats(PANDAS_OUTPUT_PATH_LAPTOP, "Pandas Laptop")
 print_stats(POLARS_OUTPUT_PATH_LAPTOP, "Polars Laptop")
 print_stats(DUCKDB_OUTPUT_PATH_LAPTOP, "DuckDB Laptop")
 
-# print_stats(PANDAS_ONLY_OUTPUT_PATH, "Pandas Taxi")
-# print_stats(DUCK_READ_OUTPUT_PATH, "DuckDB Read Taxi")
-# print_stats(DUCK_COMPUTE_OUTPUT_PATH, "DuckDB Compute Taxi")
-# print_stats(DUCK_ONLY_OUTPUT_PATH, "DuckDB Taxi")
+print_stats(PANDAS_ONLY_OUTPUT_PATH, "Pandas Taxi", record_offset=2)
+print_stats(DUCK_READ_OUTPUT_PATH, "DuckDB Read Taxi", record_offset=2)
+print_stats(DUCK_COMPUTE_OUTPUT_PATH, "DuckDB Compute Taxi", record_offset=2)
+print_stats(DUCK_ONLY_OUTPUT_PATH, "DuckDB Taxi", record_offset=2)

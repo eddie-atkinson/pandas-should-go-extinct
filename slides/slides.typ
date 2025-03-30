@@ -133,7 +133,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
+    [*Library*],[*Median Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
   $"4m 28s" $,
@@ -145,7 +145,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
+    [*Library*],[*Median Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
   $"4m 28s" $,
@@ -162,7 +162,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
+    [*Library*],[*Median Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
   $"4m 28s" $,
@@ -187,7 +187,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
+    [*Library*],[*Median Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
   $"12m 15s" $,
@@ -220,7 +220,7 @@ def do_1brc_duckdb(file_path: str):
 - In-memory column oriented data format
 #pause
 - Supported in Pandas since 2.0 (April 2023)
-#pause
+  #pause
   - Support is *getting there*
 #pause
 - *Polars and DuckDB support zero copy serialisation to and from Arrow-backed Pandas DataFrames*
@@ -231,6 +231,7 @@ def do_1brc_duckdb(file_path: str):
 - 1 Parquet file per month from 2009-
 #pause
 - Corporate wants us to find out if the Pandemic made cash less common
+  - 2019-2022 (~2.71GB of Parquet)
 #pause
 - We're using DuckDB with Pandas, also works with Polars and Pandas
 
@@ -309,7 +310,7 @@ def do_taxi_duck_compute(folder: Path):
         order by total.year, total.month
     """).df()
 ```
-== Duck Does All
+== Pure DuckDB
 ```py
 def do_taxi_duck(folder: Path):
     data = duckdb.sql(f"""
@@ -341,8 +342,36 @@ def do_taxi_duck(folder: Path):
     order by total.year, total.month
     """).df()
 ```
-== Results
-== So did cash usage fall over the Pandemic?
+== Results (11th Gen 8 Core i5, 16GiB RAM)
+#table(
+  columns: (auto, auto, auto, auto, auto),
+  align: center,
+  inset: 15pt,
+  table.header(
+    [*Approach*],[*Median Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
+  ),
+  $ "Pure Pandas" $,
+  $"41.88s" $,
+  $"146.10%"$,
+  $"14.52 GB"$,
+  $"1.92 GB"$,
+  $ "Duck Reads\n Panda Thinks" $,
+  $"28.39s" $,
+  $"793.7%"$,
+  $"14.79 GB"$,
+  $"1.22 GB"$,
+  $ "Panda Reads\n Duck Thinks" $,
+  $"29.25s" $,
+  $"765.4%"$,
+  $"12.39 GB"$,
+  $"0 MB"$,
+  $ "Pure DuckDB" $,
+  $"21.70s" $,
+  $"814.95%"$,
+  $"216.76 MB"$,
+  $"0 MB"$,
+)
+== So...did cash usage fall over the Pandemic?
 #pause
 - Yes
 #pause
@@ -367,8 +396,10 @@ def do_taxi_duck(folder: Path):
     - Ergonomics / API grokkability
     #pause
     - Transferable (and cheaper) skill set
-== You've suggested two tools, which is better?
+
+= You've suggested two tools, which is better?
 == Tool comparisons
+Foo
 
 #show: appendix
 #bibliography("works.bib")
