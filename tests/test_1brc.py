@@ -40,6 +40,5 @@ class TestOneBillionRowChallenge(TestCase):
         self.assertEqual(EXPECTED_SIMPLE_WITH_AGG, result)
 
 
-
 if __name__ == "__main__":
     main()

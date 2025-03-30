@@ -38,6 +38,7 @@ class Benchmark:
     script_path: Path
     output_file_path: Path
     is_root: bool
+    args: list[str]
 
     def __init__(
         self,
@@ -46,6 +47,7 @@ class Benchmark:
         peek_ms=100,
         n_warmup=2,
         n_iter=30,
+        args: list[str] = []
     ):
         self.n_warmup = n_warmup
         self.n_iter = n_iter
@@ -53,6 +55,7 @@ class Benchmark:
         self.script_path = script_path
         self.output_file_path = output_file_path
         self.is_root = os.getuid() == 0
+        self.args = args
 
         if not self.is_root:
             print(
@@ -62,7 +65,7 @@ class Benchmark:
     def _do_run(self, run_no: int):
         data_readings: list[UtilisationStat] = []
         spawned_process = subprocess.Popen(
-            [sys.executable, self.script_path.absolute().resolve()],
+            [sys.executable, self.script_path.absolute().resolve(), *self.args],
             stdout=sys.stdout,
             stderr=sys.stderr,
         )

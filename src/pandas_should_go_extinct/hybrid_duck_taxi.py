@@ -1,17 +1,81 @@
 from pathlib import Path
-import duckdb
 import pandas as pd
+import duckdb
 
 COLUMNS = ["tpep_pickup_datetime", "payment_type"]
+MIN_DATETIME = "2019-01-01"
+MAX_DATETIME = "2023-01-01"
+CASH = 2
 
-def do_taxi_hybrid_duck(folder: Path):
+
+def do_taxi_pandas(folder: Path):
     df = None
     for entry in folder.iterdir():
         if not entry.name.endswith("parquet"): continue
-        df = pd.concat([df, pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")], axis="index") if df is not None else pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")
-    
+        df = (pd.concat([df, pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")],axis="index") if df is not None
+        else pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")
+    )
 
-    df = df[df["tpep_pickup_datetime"] > "2019-01-01" & (df["tpep_pickup_datetime"] < "2023-01-01")]
-    
+    df = df[df["tpep_pickup_datetime"] > pd.to_datetime(MIN_DATETIME)]
+    df = df[df["tpep_pickup_datetime"] < pd.to_datetime(MAX_DATETIME)]
+
+    df["month"] = df["tpep_pickup_datetime"].dt.month
+    df["year"] = df["tpep_pickup_datetime"].dt.year
+    df = df.drop(["tpep_pickup_datetime"], axis="columns")
+    df = df.groupby(["year", "month", "payment_type"]).agg({"payment_type": "count"}).unstack(fill_value=0, level=2)["payment_type"].reset_index()
 
 
+    df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
+    df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
+
+
+def do_taxi_duck_read(folder: Path):
+    df = duckdb.sql(f"""
+        select datepart('year', tpep_pickup_datetime) as year, datepart('month', tpep_pickup_datetime) as month, payment_type from '{str(folder.absolute())}/*.parquet'
+        where tpep_pickup_datetime > '{MIN_DATETIME}' and tpep_pickup_datetime < '{MAX_DATETIME}';
+    """).df()
+
+    df = df.groupby(["year", "month", "payment_type"]).agg({"payment_type": "count"}).unstack(fill_value=0, level=2)["payment_type"].reset_index()
+    df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
+    df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
+
+
+def do_taxi_duck_compute(folder: Path):
+    df = None
+    for entry in folder.iterdir():
+        if not entry.name.endswith("parquet"): continue
+        df = (pd.concat([df, pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")],axis="index") if df is not None
+        else pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")
+    )
+
+    df = df[df["tpep_pickup_datetime"] > pd.to_datetime(MIN_DATETIME)]
+    df = df[df["tpep_pickup_datetime"] < pd.to_datetime(MAX_DATETIME)]
+
+    df["month"] = df["tpep_pickup_datetime"].dt.month
+    df["year"] = df["tpep_pickup_datetime"].dt.year
+    df = df.drop(["tpep_pickup_datetime"], axis="columns")
+
+    result = duckdb.sql(f"""
+        with total as (
+            select year, month,  count(payment_type) total_payments from df group by year, month
+        ),
+        total_cash as (
+            select year, month, count(payment_type) cash_payments from df where payment_type={CASH} group by year, month
+        )
+        select total.*, cash_payments, (cash_payments / total_payments) * 100 cash_pct from total join total_cash on total.year=total_cash.year and total.month=total_cash.month order by total.year, total.month
+    """).df()
+
+def do_taxi_duck(folder: Path):
+    result = duckdb.sql(f"""
+        with data as (
+            select datepart('year', tpep_pickup_datetime) as year, datepart('month', tpep_pickup_datetime) as month, payment_type from '{str(folder.absolute())}/*.parquet'
+            where tpep_pickup_datetime > '{MIN_DATETIME}' and tpep_pickup_datetime < '{MAX_DATETIME}'
+        ),
+        total as (
+            select year, month,  count(payment_type) total_payments from data group by year, month
+        ),
+        total_cash as (
+            select year, month, count(payment_type) cash_payments from data where payment_type={CASH} group by year, month
+        )
+        select total.*, cash_payments, (cash_payments / total_payments) * 100 cash_pct from total join total_cash on total.year=total_cash.year and total.month=total_cash.month order by total.year, total.month
+    """).df()
