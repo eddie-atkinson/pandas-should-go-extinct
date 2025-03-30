@@ -50,7 +50,7 @@
   image("figures/fleet_size_query_comparison.png"),
   caption: [Bucketed Query Runtime for Amazon RedShift Fleet Over 1 Month @van2024tpc],
 )
-= No one has or queries or Big Data\*
+= No one stores or queries Big Data\*
 #pause
 \*almost no one
 = Shut up and show me the code
@@ -133,7 +133,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max RSS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
   ),
   $ "Pandas" $,
   $"3m 57s" $,
@@ -144,7 +144,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max RSS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
   ),
   $ "Pandas" $,
   $"3m 57s" $,
@@ -159,7 +159,7 @@ def do_1brc_duckdb(file_path: str):
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max RSS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
   ),
   $ "Pandas" $,
   $"3m 57s" $,
@@ -175,30 +175,33 @@ def do_1brc_duckdb(file_path: str):
   $"1.93 GB"$,
 )]
 
-== Results (M1 MBA, 16GB RAM)
+== Results (11th Gen 8 Core i5, 16GiB RAM)
 #table(
-  columns: (auto, auto, auto, auto),
+  columns: (auto, auto, auto, auto, auto),
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max RSS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
-  $"3m 57s" $,
-  $"101.0%"$,
-  $"33.34 GB"$,
+  $"12m 15s" $,
+  $"110.35%"$,
+  $"15.67 GB"$,
+  $"21.02 GB"$,
   $ "Polars" $,
-  $"3.92s" $,
-  $"2588.5%"$,
-  $"17.98 GB"$,
+  $"39s" $,
+  $"765.75%"$,
+  $"15.22 GB"$,
+  $"35.85 MB"$,
   $ "DuckDB" $,
-  $"4.19s" $,
-  $"2979.0%"$,
-  $"1.93 GB"$,
+  $"47s" $,
+  $"807.0%"$,
+  $"546.87MB"$,
+  $"0MB"$,
 )
 
 == What do these tools give us?
-- Great performance on a flawed benchmark
+- Great performance on a *flawed benchmark*
 #pause
 - Painless multi-threading
 - Streaming
@@ -214,7 +217,7 @@ def do_1brc_duckdb(file_path: str):
 - Supported in Pandas since 2.0 (April 2023)
   - Some functions still create NumPy arrays
 #pause
-- *Polars and DuckDB support zero copy serialisation from Arrow-backed Pandas DataFrames*
+- *Polars and DuckDB support zero copy serialisation to and from Arrow-backed Pandas DataFrames*
 
 == Practical Example
 
