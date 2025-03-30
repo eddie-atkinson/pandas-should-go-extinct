@@ -83,7 +83,7 @@ Our Experimental Setup:
 ```py
 def do_1brc_pandas(file_path: str):
     df = (
-        pd.read_csv(file_path, sep=";", names=["station", "measurement"])
+        pd.read_csv(file_path, sep=";", names=["station", "measurement"], dtype_backend="pyarrow")
         .groupby("station")
         .agg({"measurement": ["min", "mean", "max"]})
         .round(2)
@@ -129,50 +129,56 @@ def do_1brc_duckdb(file_path: str):
 ```
 == Results (M7a.8xlarge)
 #alternatives[#table(
-  columns: (auto, auto, auto, auto),
+  columns: (auto, auto, auto, auto, auto),
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
-  $"3m 57s" $,
-  $"101.0%"$,
-  $"33.34 GB"$,
+  $"4m 28s" $,
+  $"113.0%"$,
+  $"38.12 GB"$,
+  $"0 MB"$,
 )][#table(
-  columns: (auto, auto, auto, auto),
+  columns: (auto, auto, auto, auto, auto),
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
-  $"3m 57s" $,
-  $"101.0%"$,
-  $"33.34 GB"$,
+  $"4m 28s" $,
+  $"113.0%"$,
+  $"38.12 GB"$,
+  $"0 MB"$,
   $ "Polars" $,
-  $"3.92s" $,
-  $"2588.5%"$,
-  $"17.98 GB"$,
+  $"5.04s" $,
+  $"3202.60%"$,
+  $"18.02 GB"$,
+  $"0 MB"$,
 )][#table(
-  columns: (auto, auto, auto, auto),
+  columns: (auto, auto, auto, auto, auto),
   align: center,
   inset: 15pt,
   table.header(
-    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],
+    [*Library*],[*Median Wall Clock Duration*], [*Median Max CPU %*],[*Median Max USS*],[*Median Max Swap*],
   ),
   $ "Pandas" $,
-  $"3m 57s" $,
-  $"101.0%"$,
-  $"33.34 GB"$,
+  $"4m 28s" $,
+  $"113.0%"$,
+  $"38.12 GB"$,
+  $"0 MB"$,
   $ "Polars" $,
-  $"3.92s" $,
-  $"2588.5%"$,
-  $"17.98 GB"$,
+  $"5.04s" $,
+  $"3202.60%"$,
+  $"18.02 GB"$,
+  $"0 MB"$,
   $ "DuckDB" $,
-  $"4.19s" $,
-  $"2979.0%"$,
+  $"5.19s" $,
+  $"3174.64%"$,
   $"1.93 GB"$,
+  $"0 MB"$,
 )]
 
 == Results (11th Gen 8 Core i5, 16GiB RAM)
@@ -196,8 +202,8 @@ def do_1brc_duckdb(file_path: str):
   $ "DuckDB" $,
   $"47s" $,
   $"807.0%"$,
-  $"546.87MB"$,
-  $"0MB"$,
+  $"546.87 MB"$,
+  $"0 MB"$,
 )
 
 == What do these tools give us?

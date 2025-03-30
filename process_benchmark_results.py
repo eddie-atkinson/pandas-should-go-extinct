@@ -2,9 +2,9 @@ import duckdb
 from pathlib import Path
 
 
-DUCKDB_OUTPUT_PATH = Path("./data/duckdb_timeseries_laptop.csv")
-POLARS_OUTPUT_PATH = Path("./data/polars_timeseries_laptop.csv")
-PANDAS_OUTPUT_PATH = Path("./data/pandas_timeseries_laptop.csv")
+DUCKDB_OUTPUT_PATH = Path("./data/duckdb_timeseries_m7a.csv")
+POLARS_OUTPUT_PATH = Path("./data/polars_timeseries_m7a.csv")
+PANDAS_OUTPUT_PATH = Path("./data/pandas_timeseries_m7a.csv")
 
 
 

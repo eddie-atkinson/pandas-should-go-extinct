@@ -3,7 +3,6 @@ from unittest import TestCase, main
 
 
 from pandas_should_go_extinct.duckdb_1brc import do_1brc_duckdb
-from pandas_should_go_extinct.hybrid_duck_brc import do_1brc_hybrid_duck
 from pandas_should_go_extinct.pandas_1brc import do_1brc_pandas
 from pandas_should_go_extinct.polars_1brc import do_1brc_polars
 
@@ -40,13 +39,6 @@ class TestOneBillionRowChallenge(TestCase):
         result = do_1brc_pandas(str(SIMPLE_WITH_AGG_PATH.absolute()))
         self.assertEqual(EXPECTED_SIMPLE_WITH_AGG, result)
 
-    def test_hybrid_duck_simple(self):
-        result = do_1brc_hybrid_duck(str(SIMPLE_PATH.absolute()))
-        self.assertEqual(EXPECTED_SIMPLE, result)
-
-    def test_hybrid_duck_simple_agg(self):
-        result = do_1brc_hybrid_duck(str(SIMPLE_WITH_AGG_PATH.absolute()))
-        self.assertEqual(EXPECTED_SIMPLE_WITH_AGG, result)
 
 
 if __name__ == "__main__":

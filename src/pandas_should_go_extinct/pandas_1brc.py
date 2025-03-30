@@ -9,7 +9,7 @@ def do_1brc_pandas(file_path: str, output_data=True) -> str:
     so there is an option not to serialise the output. However, having the output is useful for testing correctness
     """
     df = (
-        pd.read_csv(file_path, sep=";", names=["station", "measurement"])
+        pd.read_csv(file_path, sep=";", names=["station", "measurement"], dtype_backend="pyarrow")
         .groupby("station")
         .agg({"measurement": ["min", "mean", "max"]})
         .round(2)
