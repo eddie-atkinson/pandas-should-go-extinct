@@ -106,7 +106,7 @@ def do_1brc_polars(file_path: str):
             pl.col("measurement").max().round(2).alias("max"),
         )
         .sort(by="station")
-        .collect(new_streaming=True)
+        .collect(new_streaming=True) # Trigger evaluation in streaming mode
     )
 
 ```
@@ -213,7 +213,6 @@ def do_1brc_duckdb(file_path: str):
 - Streaming
 - Spill to disk
 - Lazy evaluation
-== Simple Animation
 
 = I'm interested but I've been hurt before
 
@@ -221,12 +220,155 @@ def do_1brc_duckdb(file_path: str):
 - In-memory column oriented data format
 #pause
 - Supported in Pandas since 2.0 (April 2023)
-  - Some functions still create NumPy arrays
+#pause
+  - Support is *getting there*
 #pause
 - *Polars and DuckDB support zero copy serialisation to and from Arrow-backed Pandas DataFrames*
+  - Otherwise you get a fresh copy
 
-== Practical Example
+== Practical Example: New York Taxi Data
+- Dataset of every taxi trip taken in New York
+- 1 Parquet file per month from 2009-
+#pause
+- Corporate wants us to find out if the Pandemic made cash less common
+#pause
+- We're using DuckDB with Pandas, also works with Polars and Pandas
 
+== Pure Pandas (helpers)
+```py
+def read_and_merge_dfs(folder: Path) -> pd.DataFrame:
+    df = None
+    for entry in folder.iterdir():
+        if not entry.name.endswith("parquet"): continue
+        temp = pd.read_parquet(entry, columns=COLUMNS, dtype_backend="pyarrow")
+        if df is not None:
+            df = pd.concat([df, temp])
+        else:
+            df = temp
+    df = df[df["tpep_pickup_datetime"] > pd.to_datetime(MIN_DATETIME)]
+    df = df[df["tpep_pickup_datetime"] < pd.to_datetime(MAX_DATETIME)]
+
+    df["month"] = df["tpep_pickup_datetime"].dt.month
+    df["year"] = df["tpep_pickup_datetime"].dt.year
+    df = df.drop(["tpep_pickup_datetime"], axis="columns")
+    return df
+```
+
+== Pure Pandas
+```py
+def do_taxi_pandas(folder: Path):
+    df = read_and_merge_dfs(folder)
+    df = (
+        df.groupby(["year", "month", "payment_type"])
+        .agg({"payment_type": "count"})
+        .unstack(fill_value=0, level=2)["payment_type"]
+        .reset_index()
+    )
+
+    df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
+    df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
+```
+
+== Duck Reads Panda Thinks
+```py
+def do_taxi_duck_read(folder: str):
+    df = duckdb.sql(f"""
+        select datepart('year', tpep_pickup_datetime) year, 
+          datepart('month', tpep_pickup_datetime) month, 
+          payment_type from '{folder}/*.parquet'
+        where tpep_pickup_datetime > '{MIN_DATE}'
+         and tpep_pickup_datetime < '{MAX_DATE}'"""
+      ).df()
+
+    df = (
+        df.groupby(["year", "month", "payment_type"])
+        .agg({"payment_type": "count"})
+        .unstack(fill_value=0, level=2)["payment_type"]
+        .reset_index()
+    )
+    df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
+    df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
+```
+== Panda Reads Duck Thinks
+```py
+def do_taxi_duck_compute(folder: Path):
+    df = read_and_merge_dfs(folder)
+    result = duckdb.sql(f"""
+        with total as (
+            select year, month, count(payment_type) payments from df 
+            group by year, month
+        ),
+        total_cash as (
+            select year, month, count(payment_type) cash from df 
+            where payment_type={CASH} 
+            group by year, month
+        )
+        select total.*, cash, (cash / total) * 100 cash_pct from total 
+        join total_cash 
+          on total.year=total_cash.year and total.month=total_cash.month
+        order by total.year, total.month
+    """).df()
+```
+== Duck Does All
+```py
+def do_taxi_duck(folder: Path):
+    data = duckdb.sql(f"""
+        select datepart('year', tpep_pickup_datetime) year, 
+          datepart('month', tpep_pickup_datetime) month, 
+          payment_type from '{folder}/*.parquet'
+        where tpep_pickup_datetime > '{MIN_DATE}'
+         and tpep_pickup_datetime < '{MAX_DATE}'"""
+      )
+    # continued
+```
+== Duck Does All
+```py
+def do_taxi_duck(folder: Path):
+  # Data loading on previous slide
+  result = duckdb.sql(f"""
+    with total as (
+        select year, month, count(payment_type) payments from data 
+        group by year, month
+    ),
+    total_cash as (
+        select year, month, count(payment_type) cash from data 
+        where payment_type={CASH} 
+        group by year, month
+    )
+    select total.*, cash, (cash / total) * 100 cash_pct from total 
+    join total_cash 
+      on total.year=total_cash.year and total.month=total_cash.month
+    order by total.year, total.month
+    """).df()
+```
+== Results
+== So did cash usage fall over the Pandemic?
+#pause
+- Yes
+#pause
+- Correlation !== causality, don't \@ me
+#pause
+- TODO: add figure
+= This sounds compelling, what's the catch?
+== Reasons NOT to listen to me
+#pause
+1. I'm just a guy with a laptop - do your own research
+#pause
+2. You're super deeply integrated into the Pandas ecosystem
+  #pause
+  - e.g. Geospatial
+#pause
+3. Let Pandas cook
+  #pause
+  - Progress on integrating PyArrow nicely has been...slow
+  #pause
+  - There are benefits beyond performance
+    #pause
+    - Ergonomics / API grokkability
+    #pause
+    - Transferable (and cheaper) skill set
+== You've suggested two tools, which is better?
+== Tool comparisons
 
 #show: appendix
 #bibliography("works.bib")

@@ -18,17 +18,19 @@ DUCK_COMPUTE_OUTPUT_PATH = Path("./data/taxi/duck_compute.csv")
 DUCK_ONLY_OUTPUT_PATH = Path("./data/taxi/duck_only.csv")
 
 PROFILE_FIXTURES = [
-    (SCRIPT_PATH, "pandas",  PANDAS_ONLY_OUTPUT_PATH),
-    (SCRIPT_PATH, "duck_read",  DUCK_READ_OUTPUT_PATH),
-    (SCRIPT_PATH, "duck_compute",  DUCK_COMPUTE_OUTPUT_PATH),
-    (SCRIPT_PATH, "duck",  DUCK_ONLY_OUTPUT_PATH),
+    (SCRIPT_PATH, "pandas", PANDAS_ONLY_OUTPUT_PATH),
+    (SCRIPT_PATH, "duck_read", DUCK_READ_OUTPUT_PATH),
+    (SCRIPT_PATH, "duck_compute", DUCK_COMPUTE_OUTPUT_PATH),
+    (SCRIPT_PATH, "duck", DUCK_ONLY_OUTPUT_PATH),
 ]
 
 
 def main():
     for test_script, variant, output_path in PROFILE_FIXTURES:
         print(f"Running benchmark script {test_script} with output in {output_path}")
-        benchmark = Benchmark(script_path=test_script, output_file_path=output_path, args=[variant])
+        benchmark = Benchmark(
+            script_path=test_script, output_file_path=output_path, args=[variant]
+        )
         benchmark.run()
 
 

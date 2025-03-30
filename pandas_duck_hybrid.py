@@ -15,8 +15,10 @@ OPTIONS = [PANDAS_ONLY, PANDAS_DUCK_READ, PANDAS_READ_DUCK_THINK, DUCK_ONLY]
 
 if __name__ == "__main__":
     if len(sys.argv) != 2 or sys.argv[1] not in OPTIONS:
-        print(f"Usage pandas_duck_hybrid.py [{PANDAS_ONLY} | {PANDAS_DUCK_READ} | {PANDAS_READ_DUCK_THINK} | {DUCK_ONLY}]")
-    
+        print(
+            f"Usage pandas_duck_hybrid.py [{PANDAS_ONLY} | {PANDAS_DUCK_READ} | {PANDAS_READ_DUCK_THINK} | {DUCK_ONLY}]"
+        )
+
     opt = sys.argv[1]
     if opt == PANDAS_ONLY:
         do_taxi_pandas(TAXI_PATH)

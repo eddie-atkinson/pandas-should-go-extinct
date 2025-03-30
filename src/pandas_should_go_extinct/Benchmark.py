@@ -47,7 +47,7 @@ class Benchmark:
         peek_ms=100,
         n_warmup=2,
         n_iter=30,
-        args: list[str] = []
+        args: list[str] = [],
     ):
         self.n_warmup = n_warmup
         self.n_iter = n_iter
