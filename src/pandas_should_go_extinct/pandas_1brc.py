@@ -13,7 +13,6 @@ def do_1brc_pandas(file_path: str, output_data=True) -> str:
             file_path,
             sep=";",
             names=["station", "measurement"],
-            dtype_backend="pyarrow",
         )
         .groupby("station")
         .agg({"measurement": ["min", "mean", "max"]})

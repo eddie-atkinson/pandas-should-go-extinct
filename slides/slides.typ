@@ -83,7 +83,7 @@ Our Experimental Setup:
 ```py
 def do_1brc_pandas(file_path: str):
     df = (
-        pd.read_csv(file_path, sep=";", names=["station", "measurement"], dtype_backend="pyarrow")
+        pd.read_csv(file_path, sep=";", names=["station", "measurement"])
         .groupby("station")
         .agg({"measurement": ["min", "mean", "max"]})
         .round(2)
