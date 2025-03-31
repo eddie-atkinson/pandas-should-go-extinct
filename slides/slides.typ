@@ -210,8 +210,11 @@ def do_1brc_duckdb(file_path: str):
 - Great performance on a *flawed benchmark*
 #pause
 - Painless multi-threading
+#pause
 - Streaming
+#pause
 - Spill to disk
+#pause
 - Lazy evaluation
 
 = I'm interested but I've been hurt before
@@ -224,6 +227,7 @@ def do_1brc_duckdb(file_path: str):
   - Support is *getting there*
 #pause
 - *Polars and DuckDB support zero copy serialisation to and from Arrow-backed Pandas DataFrames*
+  #pause
   - Otherwise you get a fresh copy
 
 == Practical Example: New York Taxi Data
@@ -257,8 +261,7 @@ def read_and_merge_dfs(folder: Path) -> pd.DataFrame:
 
 == Pure Pandas
 ```py
-def do_taxi_pandas(folder: Path):
-    df = read_and_merge_dfs(folder)
+def do_taxi_pandas(df: pd.DataFrame):
     df = (
         df.groupby(["year", "month", "payment_type"])
         .agg({"payment_type": "count"})
@@ -274,26 +277,19 @@ def do_taxi_pandas(folder: Path):
 ```py
 def do_taxi_duck_read(folder: str):
     df = duckdb.sql(f"""
-        select datepart('year', tpep_pickup_datetime) year, 
+        select 
+          datepart('year', tpep_pickup_datetime) year, 
           datepart('month', tpep_pickup_datetime) month, 
-          payment_type from '{folder}/*.parquet'
-        where tpep_pickup_datetime > '{MIN_DATE}'
-         and tpep_pickup_datetime < '{MAX_DATE}'"""
+          payment_type 
+        from '{folder}/*.parquet'
+        where 
+          tpep_pickup_datetime > '{MIN_DATE}'
+          and tpep_pickup_datetime < '{MAX_DATE}'"""
       ).df()
-
-    df = (
-        df.groupby(["year", "month", "payment_type"])
-        .agg({"payment_type": "count"})
-        .unstack(fill_value=0, level=2)["payment_type"]
-        .reset_index()
-    )
-    df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
-    df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
 ```
 == Panda Reads Duck Thinks
 ```py
-def do_taxi_duck_compute(folder: Path):
-    df = read_and_merge_dfs(folder)
+def do_taxi_duck_compute(df: pd.DataFrame):
     result = duckdb.sql(f"""
         with total as (
             select year, month, count(payment_type) payments from df 
@@ -313,34 +309,8 @@ def do_taxi_duck_compute(folder: Path):
 == Pure DuckDB
 ```py
 def do_taxi_duck(folder: Path):
-    data = duckdb.sql(f"""
-        select datepart('year', tpep_pickup_datetime) year, 
-          datepart('month', tpep_pickup_datetime) month, 
-          payment_type from '{folder}/*.parquet'
-        where tpep_pickup_datetime > '{MIN_DATE}'
-         and tpep_pickup_datetime < '{MAX_DATE}'"""
-      )
-    # continued
-```
-== Duck Does All
-```py
-def do_taxi_duck(folder: Path):
-  # Data loading on previous slide
-  result = duckdb.sql(f"""
-    with total as (
-        select year, month, count(payment_type) payments from data 
-        group by year, month
-    ),
-    total_cash as (
-        select year, month, count(payment_type) cash from data 
-        where payment_type={CASH} 
-        group by year, month
-    )
-    select total.*, cash, (cash / total) * 100 cash_pct from total 
-    join total_cash 
-      on total.year=total_cash.year and total.month=total_cash.month
-    order by total.year, total.month
-    """).df()
+    data = do_taxi_duck_read(folder)
+    df = do_taxi_duck_compute(data)
 ```
 == Results (11th Gen 8 Core i5, 16GiB RAM)
 #table(
@@ -372,13 +342,13 @@ def do_taxi_duck(folder: Path):
   $"0 MB"$,
 )
 == So...did cash usage fall over the Pandemic?
-#pause
 - Yes
-#pause
 - Correlation !== causality, don't \@ me
-#pause
-- TODO: add figure
-= This sounds compelling, what's the catch?
+#figure(
+  image("figures/cash_taxi.png"),
+  caption: [Percentage of cash payments for taxis by month],
+)
+= OK, why shouldn't I listen to you?
 == Reasons NOT to listen to me
 #pause
 1. I'm just a guy with a laptop - do your own research
@@ -395,11 +365,20 @@ def do_taxi_duck(folder: Path):
     #pause
     - Ergonomics / API grokkability
     #pause
-    - Transferable (and cheaper) skill set
+    - Transferable skill set
 
 = You've suggested two tools, which is better?
-== Tool comparisons
-Foo
+== Tool Showdown
+- Depends on your preference - SQL vs Code
+  - As an engineer I prefer Polars for unit testing
+- DuckDB goes well beyond dataframes
+  - e.g. Local first analytics embedded in an Android app
+  - e.g. Compile to WASM and do SQL queries for visualisation on the...frontend(?)
+== Takeaways
+- You can't avoid complex distributed querying systems, but *you can defer them (potentially indefinitely) by avoiding Pandas*
+#pause
+- We are experiencing a Cambrian explosion in dataframe tools - try them out
+
 
 #show: appendix
 #bibliography("works.bib")
