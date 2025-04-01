@@ -14,7 +14,7 @@
     institution: [Senior Software Engineer - Atlassian],
   ),
   config-colors(
-  primary: rgb("#000000"),
+  primary: rgb("#000"),
   primary-light: rgb("#d6c6b7"),
   secondary: rgb("#23373b"),
   neutral-lightest: rgb("#fafafa"),
@@ -239,9 +239,9 @@ def do_1brc_duckdb(file_path: str):
 #pause
 - We're using DuckDB with Pandas, also works with Polars and Pandas
 
-== Pure Pandas (helpers)
+== Pandas Reading
 ```py
-def read_and_merge_dfs(folder: Path) -> pd.DataFrame:
+def read_data_pandas(folder: Path) -> pd.DataFrame:
     df = None
     for entry in folder.iterdir():
         if not entry.name.endswith("parquet"): continue
@@ -259,9 +259,9 @@ def read_and_merge_dfs(folder: Path) -> pd.DataFrame:
     return df
 ```
 
-== Pure Pandas
+== Pandas Compute
 ```py
-def do_taxi_pandas(df: pd.DataFrame):
+def calculate_cash_pandas(df: pd.DataFrame):
     df = (
         df.groupby(["year", "month", "payment_type"])
         .agg({"payment_type": "count"})
@@ -271,12 +271,13 @@ def do_taxi_pandas(df: pd.DataFrame):
 
     df["total_payments"] = df.iloc[:, 2:8].sum(axis=1)
     df["cash_pct"] = (df[CASH] / df["total_payments"]) * 100
+    return df
 ```
 
-== Duck Reads Panda Thinks
+== DuckDB Reading
 ```py
-def do_taxi_duck_read(folder: str):
-    df = duckdb.sql(f"""
+def read_data_duck(folder: str):
+    return duckdb.sql(f"""
         select 
           datepart('year', tpep_pickup_datetime) year, 
           datepart('month', tpep_pickup_datetime) month, 
@@ -285,12 +286,12 @@ def do_taxi_duck_read(folder: str):
         where 
           tpep_pickup_datetime > '{MIN_DATE}'
           and tpep_pickup_datetime < '{MAX_DATE}'"""
-      ).df()
+      )
 ```
-== Panda Reads Duck Thinks
+== DuckDB Compute
 ```py
-def do_taxi_duck_compute(df: pd.DataFrame):
-    result = duckdb.sql(f"""
+def calculate_cash_duck(data):
+    return duckdb.sql(f"""
         with total as (
             select year, month, count(payment_type) payments from df 
             group by year, month
@@ -306,10 +307,22 @@ def do_taxi_duck_compute(df: pd.DataFrame):
         order by total.year, total.month
     """).df()
 ```
-== Pure DuckDB
+== Test Cases
 ```py
-def do_taxi_duck(folder: Path):
-    data = do_taxi_duck_read(folder)
+def pure_pandas(folder: Path):
+  data = read_data_pandas(folder)
+  df = calculate_cash_pandas(data)
+
+def duck_reads_panda_thinks(folder: Path):
+  data = read_data_duck(folder).df()
+  df = calculate_cash_pandas(data)
+
+def panda_reads_duck_thinks(folder: Path):
+  data = read_data_pandas(folder)
+  df = calculate_cash_duck(data)
+
+def pure_duck(folder: Path):
+    data = read_data_duck(folder)
     df = do_taxi_duck_compute(data)
 ```
 == Results (11th Gen 8 Core i5, 16GiB RAM)
@@ -378,6 +391,11 @@ def do_taxi_duck(folder: Path):
 - You can't avoid complex distributed querying systems, but *you can defer them (potentially indefinitely) by avoiding Pandas*
 #pause
 - We are experiencing a Cambrian explosion in dataframe tools - try them out
+== Shameless Self-Promotion
+- GitHub: #link("https://github.com/eddie-atkinson/pandas-should-go-extinct")
+- LinkedIn: #link("https://www.linkedin.com/in/eddie-atkinson")
+- Blog: #link("https://eddie.codes")
+
 
 
 #show: appendix
