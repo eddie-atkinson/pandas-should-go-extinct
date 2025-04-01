@@ -110,6 +110,13 @@ def do_1brc_polars(file_path: str):
     )
 
 ```
+#pause
+#place(
+  bottom + left,
+  dx: 78pt,
+  dy: -20pt,
+  rect(width: 270pt, height: 25pt, fill: none, stroke: red),
+)
 == DuckDB
 ```py
 def do_1brc_duckdb(file_path: str):
@@ -217,7 +224,7 @@ def do_1brc_duckdb(file_path: str):
 #pause
 - Lazy evaluation
 
-= I'm interested but I've been hurt before
+= I'm interested, but shiny tools have hurt me before
 
 == Painless Adoption with Arrow
 - In-memory column oriented data format
@@ -258,7 +265,13 @@ def read_data_pandas(folder: Path) -> pd.DataFrame:
     df = df.drop(["tpep_pickup_datetime"], axis="columns")
     return df
 ```
-
+#pause
+#place(
+  top + right,
+  dx: 7pt,
+  dy: 100pt,
+  rect(width: 250pt, height: 25pt, fill: none, stroke: red),
+)
 == Pandas Compute
 ```py
 def calculate_cash_pandas(df: pd.DataFrame):
@@ -288,6 +301,20 @@ def read_data_duck(folder: str):
           and tpep_pickup_datetime < '{MAX_DATE}'"""
       )
 ```
+#pause
+#place(
+  bottom  + left,
+  dx: 70pt,
+  dy: -158pt,
+  rect(width: 250pt, height: 20pt, fill: none, stroke: red),
+)
+#pause
+#place(
+  bottom  + left,
+  dx: 70pt,
+  dy: -80pt,
+  rect(width: 450pt, height: 55pt, fill: none, stroke: red),
+)
 == DuckDB Compute
 ```py
 def calculate_cash_duck(data):
